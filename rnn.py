@@ -167,5 +167,33 @@ if __name__ == "__main__":
 
         print(f"[Epoch {epoch + 1}] Training Loss: {(loss_total / loss_count).item():.4f}")
         print(f"[Epoch {epoch + 1}] Validation Accuracy: {validation_accuracy:.4f}")
-        
+
         epoch += 1
+
+# Run on test set & get test accuracy
+print("========== Running on Test Set ==========")
+
+with open(args.test_data) as test_f:
+    raw_test = json.load(test_f)
+
+test_data = [(elt["text"].split(), int(elt["stars"] - 1)) for elt in raw_test]
+
+model.eval()
+correct = 0
+total = 0
+
+for input_words, gold_label in tqdm(test_data):
+    input_words = " ".join(input_words)
+    input_words = input_words.translate(input_words.maketrans("", "", string.punctuation)).split()
+    vectors = [word_embedding[i.lower()] if i.lower() in word_embedding.keys() else word_embedding['unk'] for i in input_words]
+    vectors_np = np.array(vectors)
+    vectors = torch.tensor(vectors_np).view(len(vectors_np), 1, -1)
+    output = model(vectors)
+    predicted_label = torch.argmax(output)
+    correct += int(predicted_label == gold_label)
+    total += 1
+
+print(f"Test accuracy: {correct / total:.4f}")
+
+
+

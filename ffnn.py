@@ -187,4 +187,32 @@ if __name__ == "__main__":
         print("Validation accuracy for epoch {}: {}".format(epoch + 1, correct / total))
         print("Validation time for this epoch: {}".format(time.time() - start_time))
 
+
+
+# Run on test set & get test accuracy
+if args.test_data != "to fill":
+    print("\n========== Running on Test Set ==========")
+    with open(args.test_data) as f:
+        test_json = json.load(f)
+
+    # Convert test data to bag-of-words vectors
+    test_data = [(x["text"].split(), int(x["stars"]) - 1) for x in test_json]
+    test_data = convert_to_vector_representation(test_data, word2index)
+
+    model.eval()
+    correct = 0
+    total = 0
+    minibatch_size = 16
+    N = len(test_data)
+    for minibatch_index in range(N // minibatch_size):
+        for example_index in range(minibatch_size):
+            input_vector, gold_label = test_data[minibatch_index * minibatch_size + example_index]
+            predicted_vector = model(input_vector)
+            predicted_label = torch.argmax(predicted_vector)
+            correct += int(predicted_label == gold_label)
+            total += 1
+    print("Test Accuracy: {:.4f}".format(correct / total))
+
+
+
     # write out to results/test.out
