@@ -32,11 +32,14 @@ class FFNN(nn.Module):
 
     def forward(self, input_vector):
         # [to fill] obtain first hidden layer representation
-
+        hidden = self.activation(self.W1(input_vector))
+        
         # [to fill] obtain output layer representation
-
+        output = self.W2(hidden)
+        
         # [to fill] obtain probability dist.
-
+        predicted_vector = self.softmax(output)
+        
         return predicted_vector
 
 
@@ -154,6 +157,7 @@ if __name__ == "__main__":
             optimizer.step()
         print("Training completed for epoch {}".format(epoch + 1))
         print("Training accuracy for epoch {}: {}".format(epoch + 1, correct / total))
+        print("Training loss for epoch {}: {:.4f}".format(epoch + 1, loss.item()))
         print("Training time for this epoch: {}".format(time.time() - start_time))
 
 
@@ -184,4 +188,3 @@ if __name__ == "__main__":
         print("Validation time for this epoch: {}".format(time.time() - start_time))
 
     # write out to results/test.out
-    
