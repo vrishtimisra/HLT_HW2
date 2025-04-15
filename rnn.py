@@ -29,16 +29,19 @@ class RNN(nn.Module):
 
     def compute_Loss(self, predicted_vector, gold_label):
         return self.loss(predicted_vector, gold_label)
-
     def forward(self, inputs):
         # [to fill] obtain hidden layer representation (https://pytorch.org/docs/stable/generated/torch.nn.RNN.html)
-        _, hidden = self.rnn(inputs)
+        output, hidden = self.rnn(inputs)
+
+        # [to fill] sum over output
+        output_sum = torch.sum(output, dim=0)  # Summing over the sequence dimension
+
         # [to fill] obtain output layer representations
-        # _ is the output from self.rnn
-        # [to fill] sum over output 
-        output = torch.sum(_, dim=0)
+        logits = self.W(output_sum)
+
         # [to fill] obtain probability dist.
-        predicted_vector = self.softmax(output)
+        predicted_vector = self.softmax(logits)
+
         return predicted_vector
 
 
@@ -166,7 +169,6 @@ if __name__ == "__main__":
             last_train_accuracy = training_accuracy
 
         print(f"[Epoch {epoch + 1}] Training Loss: {(loss_total / loss_count).item():.4f}")
-        print(f"[Epoch {epoch + 1}] Validation Accuracy: {validation_accuracy:.4f}")
 
         epoch += 1
 
